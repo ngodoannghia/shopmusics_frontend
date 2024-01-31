@@ -1,0 +1,13 @@
+.nopadding label{
+    padding:0px;
+    margin:0px;
+    padding-top:5px;
+}
+.nopadding div{
+    padding:0px;
+    margin:0px
+}
+.nopadding {
+    padding:0px;
+    margin:0px
+}
