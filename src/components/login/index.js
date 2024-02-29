@@ -14,7 +14,7 @@ function Login(props) {
     setLoading(true)
     trackPromise(new Promise((resolve)=>{
       
-        ApiService.requestLogin(username,password).then((data)=>{
+        ApiService.loginAdmin(username,password).then((data)=>{
             console.log(props)
             props.history.push("/")
             setLoading(false)

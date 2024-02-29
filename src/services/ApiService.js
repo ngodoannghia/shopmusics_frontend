@@ -5,6 +5,8 @@ var dataCategory = {};
 
 const HOST = window.apiHOST
 authToken = localStorage.getItem("token")
+
+// Function old
 try{ 
 userInfo = JSON.parse( localStorage.getItem("userInfo")??"{}" )
  var date = (new Date()).getTime()
@@ -16,11 +18,19 @@ userInfo = JSON.parse( localStorage.getItem("userInfo")??"{}" )
 } catch {
 
 }
+
+
 function setToken (token){
     authToken = token;
     localStorage.setItem("token",token);
-   
+
 }
+
+function setCookie (name, token){
+    authToken = name + "=" + token
+    localStorage.setItem("cookie", authToken);
+}
+
 function isAuthen(){
     return authToken != null
 }
@@ -29,6 +39,12 @@ function clearData(){
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
 }
+
+function clearData2(){
+    localStorage.removeItem("cookie");
+    localStorage.removeItem("userInfo");
+}
+
 function setUserInfo(user){
     localStorage.setItem("userInfo",JSON.stringify(user));
     userInfo = user;
@@ -44,6 +60,13 @@ function getHeader2(more = {}){
     return  {...more,token:authToken};  
 }
 
+function getHeader_cookie(more = {}){
+    return  {"Content-Type":"application/json",...more,Cookie:authToken};  
+}
+
+function getHeader_cookie2(more = {}){
+    return  {...more,Cookie:authToken};  
+}
 
 function requestGetMusic(id){
     var url = HOST+"music/detail/"+id;
@@ -57,6 +80,19 @@ function requestGetMusic(id){
         return json.data;
     });
 }
+
+function getMusic(id){
+    var url = HOST + "api/song/" + id;
+    return fetch(url, {
+        headers: getHeader_cookie()
+    }).then(res => res.json()).then(json =>{
+        if (json.code != 200){
+            throw "Request Failed"
+        }
+        return json.data;
+    })
+}
+
 function getOriginMusic(id){
     var url = HOST+"music/detailbydemo/"+id;
     return fetch(url, { 
@@ -180,6 +216,29 @@ function requestLogin(username,password){
     });
 }
 
+function loginAdmin(username, password){
+    var url = HOST + "api/admin/login"
+    console.log("url: ", url)
+    console.log("host: ", HOST)
+    return fetch(url, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+            username:username,
+            password:password
+        }),
+        headers: getHeader_cookie()
+    }).then(res => res.json()).then(json => {
+        if (json.code != 200){
+            throw "Login failed"
+        }
+        setCookie(json.data.name, json.data.token);
+        json.data.user.timestamp = (new Date()).getTime();
+        setUserInfo(json.data);
+
+        return json.data;
+    })
+}
     
 function requestUploadAvatar(formData){
     var url = HOST+"util/avatar/upload";
@@ -925,7 +984,9 @@ export  {
     requestListByParent,
     requestResourceUrl,
     requestDeletePending,
-    HOST
+    HOST,
     
+    loginAdmin,
+    getMusic
     
 }
