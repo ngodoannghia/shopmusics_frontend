@@ -86,8 +86,8 @@ function getMusic(id){
     return fetch(url, {
         headers: getHeader_cookie()
     }).then(res => res.json()).then(json =>{
-        if (json.code != 200){
-            throw "Request Failed"
+        if (json.code !== 200){
+            throw new Error("Request Failed")
         }
         return json.data;
     })
@@ -167,7 +167,7 @@ function requestUpdateData(data){
         headers:  getHeader()
     }).then(res => res.json()).then(async json=>{
         if (json.code !=0){
-            throw "Request Failed"
+            throw new Error("Request Failed")
             return;
         }  
         return json.data;
@@ -216,29 +216,31 @@ function requestLogin(username,password){
     });
 }
 
-function loginAdmin(username, password){
-    var url = HOST + "api/admin/login"
+function loginAdmin(username, password) {
+    var url = HOST + "api/admin/login";
     console.log("url: ", url)
     console.log("host: ", HOST)
     return fetch(url, {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify({
-            username:username,
-            password:password
+            username: username,
+            password: password
         }),
         headers: getHeader_cookie()
     }).then(res => res.json()).then(json => {
-        if (json.code != 200){
-            throw "Login failed"
+        console.log("data" + json.token)
+        if (json.code !== 200) {
+            throw new Error("Login failed");
         }
-        setCookie(json.data.name, json.data.token);
+        setCookie(json.name, json.token);
         json.data.user.timestamp = (new Date()).getTime();
-        setUserInfo(json.data);
+        setUserInfo(json.data.user);
 
         return json.data;
-    })
+    });
 }
+
     
 function requestUploadAvatar(formData){
     var url = HOST+"util/avatar/upload";
